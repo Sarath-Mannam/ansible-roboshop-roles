@@ -1,0 +1,6 @@
+# Ansible automatically loads main.yaml
+- name: Installing Roboshop project
+  hosts: mongodb
+  become: yes
+  roles:
+  - mongodb
