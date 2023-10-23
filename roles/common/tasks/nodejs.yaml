@@ -1,0 +1,8 @@
+- name: setup NPM source  # Setup NodeJS repos. Vendor is providing a script to setup the repos.
+  ansible.builtin.shell: "curl -sL https://rpm.nodesource.com/setup_lts.x | bash"
+    # sometimes when you don't have a module inside ansible then we can always use this command module
+
+- name: Install NodeJS
+  ansible.builtin.yum:
+    name: nodejs
+    state: installed
