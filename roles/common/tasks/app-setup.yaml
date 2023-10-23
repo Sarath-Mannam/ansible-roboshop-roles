@@ -1,0 +1,39 @@
+- name: check roboshop user exist or not
+    # Whenever you want to run linux commands directly i.e in the case ansible module is not available
+    # When the user does not exist, ansible will treat this as failure and comes out by default, So we have to ignore errors.
+  ansible.builtin.command: id roboshop
+  register: output # Here output is name of the variable
+  ignore_errors: true # ansible will proceed even it faces with error at this stage
+    # So Ansible will run this { id roboshop } command and it will store the output in this output variable.
+
+- when: output.rc != 0 # if this expression is true then only this module will run. 
+  name: create user roboshop  # When user doesnot exit creates the roboshop user based on when output.rc != 0
+  become: yes # give sudo access for this task to create the roboshop user
+  ansible.builtin.user:
+    name: roboshop
+
+- name: check /app directory exists or not # stat module is used to check the statistics of files and folders
+  ansible.builtin.stat: # When we run this command output will be stored inside directory variable
+    path: /app
+  register: directory
+
+- name: print the directory stats
+  ansible.builtin.debug:
+    msg: "output: {{directory}}"
+
+- when: directory.stat.exists == False
+  name: create /app directory
+  ansible.builtin.file:
+    path: /app
+    state: directory
+
+- name: "download {{component}} artifact"
+  ansible.builtin.get_url:
+    url: "https://roboshop-builds.s3.amazonaws.com/{{component}}.zip"
+    dest: /tmp
+
+- name: extract {{component}} artifact
+  ansible.builtin.unarchive:
+    src: /tmp/{{component}}.zip
+    dest: /app
+    remote_src: yes
