@@ -1,0 +1,20 @@
+- name: Install nodejs 
+  ansible.builtin.import_role:
+    name: common
+    tasks_from: nodejs
+
+- name: Setup Application
+  ansible.builtin.import_role:
+    name: common
+    tasks_from: app-setup
+
+# This is not common across all the components in roboshop and it will be common for nodejs related component only.
+- name: install dependencies  # here first ansible will move to /app directory and it run's the npm install command
+  ansible.builtin.command: npm install
+  args: 
+    chdir: /app
+
+- name: Setup Application
+  ansible.builtin.import_role:
+    name: common
+    tasks_from: systemd-setup
